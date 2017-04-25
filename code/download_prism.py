@@ -39,6 +39,7 @@ def download_prism(var, time_scale, start_year, end_year):
         print('Downloading data for Year %d'%y)
         ftp.cwd('%d/' %y)
         fn_list = ftp.nlst()
+        fn_list.sort()
         for fn in fn_list:
             print(fn)
             ftp.retrbinary("RETR " + fn ,open(fn, 'wb').write)
@@ -49,14 +50,16 @@ def download_prism(var, time_scale, start_year, end_year):
     ftp.quit()
     os.chdir(currdir)
 
+def main():
+    time_scale = 'monthly' 
+    start_year = 1981
+    end_year = 2016
+   # download_prism('ppt', time_scale, start_year, end_year)
+    download_prism('tmax', time_scale, start_year, end_year)
+    download_prism('tmin', time_scale, start_year, end_year)
+    download_prism('tdmin', time_scale, start_year, end_year)
+    download_prism('vpdmax', time_scale, start_year, end_year)
+    download_prism('vpdmin', time_scale, start_year, end_year)
 
 if __name__ == "__main__":
-    time_scale = 'daily' 
-    start_year = 1982
-    end_year = 2016
-    download_prism('ppt', time_scale, start_year, end_year)
-   # download_prism('tmax', time_scale, start_year, end_year)
-   # download_prism('tmin', time_scale, start_year, end_year)
-   # download_prism('tdmin', time_scale, start_year, end_year)
-   # download_prism('vpdmax', time_scale, start_year, end_year)
-   # download_prism('vpdmin', time_scale, start_year, end_year)
+    main()
