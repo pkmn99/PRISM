@@ -16,7 +16,8 @@ import os
 def download_prism(var, time_scale, start_year, end_year):
 
     print ('Download PRISM %s %s from %d to %d' %(time_scale, var, start_year, end_year))
-    print ('Create folder %s/%s in current dir if not exist'%(time_scale, var))
+    print ('Create folder %s/%s in destination dir if not exist'%(time_scale, var))
+    os.chdir('../data/')
     
     currdir=os.getcwd()
     path = '%s/%s/'%(time_scale,var)
@@ -28,16 +29,34 @@ def download_prism(var, time_scale, start_year, end_year):
     print ('Connect to PRISM FTP')
     ftp = ftplib.FTP('prism.nacse.org') 
     ftp.login()
+    ftp.cwd('%s/%s/' %(time_scale, var))
     
     for y in range(start_year, end_year):
+        # Create year folder
+        if not os.path.exists(str(y)):
+            os.makedirs(str(y))
+        os.chdir(str(y))
         print('Downloading data for Year %d'%y)
-        ftp.cwd('%s/%s/%d/' %(time_scale, var, y))
+        ftp.cwd('%d/' %y)
         fn_list = ftp.nlst()
         for fn in fn_list:
             print(fn)
             ftp.retrbinary("RETR " + fn ,open(fn, 'wb').write)
         ftp.cwd('../')
+        os.chdir('../')
     
     print('Download complete, close FTP connection')
     ftp.quit()
     os.chdir(currdir)
+
+
+if __name__ == "__main__":
+    time_scale = 'daily' 
+    start_year = 1982
+    end_year = 2016
+    download_prism('ppt', time_scale, start_year, end_year)
+   # download_prism('tmax', time_scale, start_year, end_year)
+   # download_prism('tmin', time_scale, start_year, end_year)
+   # download_prism('tdmin', time_scale, start_year, end_year)
+   # download_prism('vpdmax', time_scale, start_year, end_year)
+   # download_prism('vpdmin', time_scale, start_year, end_year)
