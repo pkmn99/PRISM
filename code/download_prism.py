@@ -4,7 +4,7 @@ PRISM data is for Recent Years (Jan 1981 - Sep 2016)
 Usage::
 download_prism(var, time_scale, start_year, end_year)
 time_scale: 'daily' or 'monthly' 
-var: 'ppt','tdmin', 'tmax', 'tmin', 'vpdmax', 'vpdmin'
+var: 'ppt', 'tmax', 'tmin', 'tdmean', 'vpdmax', 'vpdmin'
 start_year: 1981 ~ 2016
 end_year: 1981 ~ 2016
 source: http://www.prism.oregonstate.edu/recent/
@@ -31,7 +31,7 @@ def download_prism(var, time_scale, start_year, end_year):
     ftp.login()
     ftp.cwd('%s/%s/' %(time_scale, var))
     
-    for y in range(start_year, end_year):
+    for y in range(start_year, end_year + 1):
         # Create year folder
         if not os.path.exists(str(y)):
             os.makedirs(str(y))
@@ -51,13 +51,14 @@ def download_prism(var, time_scale, start_year, end_year):
     os.chdir(currdir)
 
 def main():
-    time_scale = 'monthly' 
-    start_year = 1981
-    end_year = 2016
-   # download_prism('ppt', time_scale, start_year, end_year)
+   # time_scale = 'monthly' 
+    time_scale = 'daily' 
+    start_year = 2016
+    end_year = 2017
+    download_prism('ppt', time_scale, start_year, end_year)
     download_prism('tmax', time_scale, start_year, end_year)
     download_prism('tmin', time_scale, start_year, end_year)
-    download_prism('tdmin', time_scale, start_year, end_year)
+    download_prism('tdmean', time_scale, start_year, end_year)
     download_prism('vpdmax', time_scale, start_year, end_year)
     download_prism('vpdmin', time_scale, start_year, end_year)
 
