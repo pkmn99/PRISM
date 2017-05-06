@@ -1,5 +1,6 @@
 # use mygeo enviroment for local machine
 # zonal statistics to covert prism data to US county mean 
+import numpy as np
 import pandas as pd
 import gdal, gdalconst
 from affine import Affine
@@ -37,16 +38,16 @@ var = 'ppt', 'tdmean', 'tmax', 'tmin', 'vpdmax', 'vpdmin'
 """
 # 05/04/2017
 def zonal_county_value(yyyymmdd_start, yyyymmdd_end, var='ppt'):
-    # shape_fn = '../data/US_county_gis/counties.shp'
     # Load shapefile and construct pandas frame 
     shape_fn = '../../US_county_gis/counties.shp'
     shapes = shpreader.Reader(shape_fn)
     county_fips = [i.attributes['FIPS'] for i in shapes.records()]
-    df = pd.DataFrame({'FIPS': county_fips})
 
     fn_path = '../data/daily/' + var  + '/'
 
     time_range = pd.period_range(start=yyyymmdd_start, end=yyyymmdd_end, freq='D')
+    df = pd.DataFrame(np.zeros([len(time_range), len(county_fips)]).fill(np.nan),
+                      index=time_range, columns=county_fips)
 
     # zonal statistics for each day 
     for t in time_range:
@@ -54,18 +55,27 @@ def zonal_county_value(yyyymmdd_start, yyyymmdd_end, var='ppt'):
         fn_path = '../data/daily/' + var  + '/' + t.strftime('%Y') + '/'
         fn = 'PRISM_%s_stable_4kmD2_%s_bil' %(var, yyyymmdd)
         bil = BilFile(fn_path, fn)
+
         print(t)
-#         zs = my_zonal_statistics(shape_fn, bil.get_array(), bil.nodatavalue, bil.affine)
         zs = zonal_stats(shape_fn, bil.get_array(), nodata=bil.nodatavalue, affine=bil.affine)
     
-        # save zonal results as one column of df
-        df[t]=[i['mean'] for i in zs]
-        
+        # save zonal results
+        df.loc[t]=[i['mean'] for i in zs]
+        # Save to csv at the end of each year
+        if (t.dayofyear == 365) | (t.dayofyear == 366):
+            print('save file at the end of year %s'%t.strftime('%Y'))
+            df[t.strftime('%Y')].to_csv('../data/county_level/%s_daily_%s_county.csv'%(var, t.strftime('%Y')))
+
     return df
 
 def main():
-    df = zonal_county_value('20000101', '20151231', var='ppt')
-    print('OK')
+    day_start = '20000101'
+   # day_start = '20151229'
+    day_end = '20151231'
+    var = 'ppt'
+    df = zonal_county_value(day_start, day_end, var='ppt')
+    print('done')
+   # df.to_csv('../data/county_level/%s_%s_%s_county.csv'%(var, day_start, day_end))
 
 if __name__ == '__main__':
     main()
