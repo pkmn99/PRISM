@@ -36,14 +36,20 @@ yyyymmdd_start = '19810101'
 yyyymmdd_start = '20151231'
 var = 'ppt', 'tdmean', 'tmax', 'tmin', 'vpdmax', 'vpdmin'
 """
+# file name string pattern for each variable
+def filename_string(var, yyyymmdd):
+    if var == 'ppt':
+        fn = 'PRISM_%s_stable_4kmD2_%s_bil' %(var, yyyymmdd)
+    else:
+        fn = 'PRISM_%s_stable_4kmD1_%s_bil' %(var, yyyymmdd)
+    return fn
+
 # 05/04/2017
 def zonal_county_value(yyyymmdd_start, yyyymmdd_end, var='ppt'):
     # Load shapefile and construct pandas frame 
     shape_fn = '../../US_county_gis/counties.shp'
     shapes = shpreader.Reader(shape_fn)
     county_fips = [i.attributes['FIPS'] for i in shapes.records()]
-
-    fn_path = '../data/daily/' + var  + '/'
 
     time_range = pd.period_range(start=yyyymmdd_start, end=yyyymmdd_end, freq='D')
     df = pd.DataFrame(np.zeros([len(time_range), len(county_fips)]).fill(np.nan),
@@ -53,7 +59,8 @@ def zonal_county_value(yyyymmdd_start, yyyymmdd_end, var='ppt'):
     for t in time_range:
         yyyymmdd = t.strftime('%Y%m%d')
         fn_path = '../data/daily/' + var  + '/' + t.strftime('%Y') + '/'
-        fn = 'PRISM_%s_stable_4kmD2_%s_bil' %(var, yyyymmdd)
+        fn = filename_string(var, yyyymmdd)
+       # fn = 'PRISM_%s_stable_4kmD2_%s_bil' %(var, yyyymmdd)
         bil = BilFile(fn_path, fn)
 
         print(t)
@@ -72,7 +79,7 @@ def main():
     day_start = '20000101'
    # day_start = '20151229'
     day_end = '20151231'
-    var = 'ppt'
+    var = 'tmax'
     df = zonal_county_value(day_start, day_end, var='ppt')
     print('done')
    # df.to_csv('../data/county_level/%s_%s_%s_county.csv'%(var, day_start, day_end))
