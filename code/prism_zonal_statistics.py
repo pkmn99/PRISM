@@ -29,13 +29,6 @@ class BilFile(object):
             print('cannot find file')
         return self.data
 
-"""
-Get county level value for PRISM daily data
-df = zonal_county_value(yyyymmdd_start, yyyymmdd_end, var='ppt')
-yyyymmdd_start = '19810101'
-yyyymmdd_start = '20151231'
-var = 'ppt', 'tdmean', 'tmax', 'tmin', 'vpdmax', 'vpdmin'
-"""
 # file name string pattern for each variable
 def filename_string(var, yyyymmdd):
     if var == 'ppt':
@@ -44,6 +37,13 @@ def filename_string(var, yyyymmdd):
         fn = 'PRISM_%s_stable_4kmD1_%s_bil' %(var, yyyymmdd)
     return fn
 
+"""
+Get county level value for PRISM daily data
+df = zonal_county_value(yyyymmdd_start, yyyymmdd_end, var='ppt')
+yyyymmdd_start = '19810101'
+yyyymmdd_start = '20151231'
+var = 'ppt', 'tdmean', 'tmax', 'tmin', 'vpdmax', 'vpdmin'
+"""
 # 05/04/2017
 def zonal_county_value(yyyymmdd_start, yyyymmdd_end, var='ppt'):
     # Load shapefile and construct pandas frame 
@@ -77,7 +77,6 @@ def zonal_county_value(yyyymmdd_start, yyyymmdd_end, var='ppt'):
 
 def main():
     day_start = '20000101'
-   # day_start = '20151229'
     day_end = '20151231'
     var = 'tmax'
     df = zonal_county_value(day_start, day_end, var='ppt')
