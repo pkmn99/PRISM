@@ -68,10 +68,14 @@ def zonal_county_value(yyyymmdd_start, yyyymmdd_end, var='ppt', ver_txt='stable'
     
         # save zonal results
         df.loc[t]=[i['mean'] for i in zs]
-        # Save to csv at the end of each year
+        # Save to csv at the end of each year, or at the end of the test year
         if (t.dayofyear == 365) | (t.dayofyear == 366):
             print('save file at the end of year %s'%t.strftime('%Y'))
             df[t.strftime('%Y')].to_csv('../data/county_level/%s_daily_%s_county.csv'%(var, t.strftime('%Y')))
+
+        if yyyymmdd==yyyymmdd_end:
+            print('save file at the end of input end date %s'%t.strftime('%Y%m%d'))
+            df[t.strftime('%Y')].to_csv('../data/county_level/%s_daily_%s_county_%s.csv'%(var, t.strftime('%Y'),t.strftime('%m%d')))
 
     return df
 
